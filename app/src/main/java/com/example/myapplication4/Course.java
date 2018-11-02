@@ -2,7 +2,7 @@ package com.example.myapplication4;
 public class Course {
     private String content;//内容
     private String teacher;//老师名
-    private String teacherNum;
+    private String teacherNum;//编号
     public Course() {
     }
     public Course( String content, String teacher,String teacherNum) {

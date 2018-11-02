@@ -5,14 +5,14 @@
     android:orientation="vertical">
     <LinearLayout
         android:layout_width="wrap_content"
-        android:layout_height="50dp"
+        android:layout_height="100dp"
         android:orientation="horizontal">
         <android.support.v7.widget.AppCompatAutoCompleteTextView
-            android:layout_width="160dp"
-            android:layout_height="50dp"
+            android:layout_width="150dp"
+            android:layout_height="100dp"
             android:hint="按教师查询："
             android:id="@+id/teacher"
-            android:background="#FFFFFF"
+            android:background="#EED8AE"
             android:textColor="#0D0D0D"
             android:completionThreshold="1"/>
         <Spinner
@@ -23,7 +23,7 @@
         <Button
             android:id="@+id/displayCourse"
             android:layout_width="100dp"
-            android:layout_height="50dp"
+            android:layout_height="100dp"
             android:text="查询课表"
             android:textColor="#0D0D0D" />
 
@@ -53,12 +53,4 @@
                 android:hint="请输入验证码"/>
         </LinearLayout>
     </LinearLayout>
-    <WebView
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_weight="20"
-        android:id="@+id/we1">
-
-    </WebView>
-
 </LinearLayout>

@@ -3,7 +3,6 @@ package com.example.myapplication4;;
 public class Teacher {
     private String number;
     private String name;
-
     public Teacher() {
     }
     public Teacher(String number,String name){

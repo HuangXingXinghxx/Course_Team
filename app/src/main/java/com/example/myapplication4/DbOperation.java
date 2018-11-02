@@ -46,11 +46,26 @@ public class DbOperation {
         if(courseList.size()==0) return null;
         return courseList.get(0);
     }
-
     public void add(Course course) {
         //add
         SQLiteDatabase db = myHelper.getReadableDatabase();
         String sql1 = "insert into Course(content,teacher,teacherNum) values(?,?,?)";
         db.execSQL(sql1, new Object[]{ course.getContent(), course.getTeacher(), course.getTeacherNum()});
+    }
+    public ArrayList<String>SelectTeaName(){
+        ArrayList<String> localteacherName = new ArrayList<>();
+        String sql = "select * from Course";
+        SQLiteDatabase db = myHelper.getReadableDatabase();
+        Cursor cur =  db.rawQuery(sql,null);
+        while(cur.moveToNext()){
+            String teacher = cur.getString(cur.getColumnIndex("teacher"));
+            localteacherName.add(teacher);
+        }
+        return localteacherName;
+    }
+    public void Delete(String name){
+        SQLiteDatabase db = myHelper.getReadableDatabase();
+        String sql1 = "delete from course where teacher=?";
+        db.execSQL(sql1,new Object[]{name});
     }
 }
