@@ -11,7 +11,6 @@ import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
-import android.widget.Adapter;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.AutoCompleteTextView;
@@ -19,9 +18,11 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
+import android.widget.ListView;
 import android.widget.Spinner;
 import android.widget.Toast;
 
+import com.example.myapplication4.adapter.HistoryAdapter;
 import com.example.myapplication4.beans.Course;
 import com.example.myapplication4.utill.DbOperation;
 import com.example.myapplication4.utill.Spider;
@@ -32,7 +33,9 @@ import org.json.JSONObject;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.HashSet;
+import java.util.Map;
 import java.util.Set;
 
 public class MainActivity extends AppCompatActivity {
@@ -41,7 +44,8 @@ public class MainActivity extends AppCompatActivity {
     private static final int GET_VERIFICATION = 0;
     //数据
     private ArrayList<String> teacherNameList = new ArrayList<String>();
-    private Set loaclTeacher = new HashSet();
+    private Set loaclTeacherNameSet = new HashSet();
+    private ArrayList<Map<String,String>> historyCourseList = new ArrayList<Map<String,String>>();
     private ArrayList<Teacher> teachers = null;
 //    private Teacher currentTeacher;
     //工具类
@@ -56,11 +60,14 @@ public class MainActivity extends AppCompatActivity {
     private EditText edittext;
     private Button displayCourse;
     private LinearLayout linearLayout;
+    private ListView historyList;
     //Adapter
     private ArrayAdapter<String> spinnerAdapter;
+    private HistoryAdapter historyAdapter;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
+
         super.onCreate(savedInstanceState);
         ActionBar actionBar = getSupportActionBar();
         setContentView(R.layout.search);
@@ -69,6 +76,7 @@ public class MainActivity extends AppCompatActivity {
         autocomplementView = findViewById(R.id.teacher);
         edittext=findViewById(R.id.et1);
         sp = findViewById(R.id.weekSpinner);
+        historyList = findViewById(R.id.history);
         linearLayout = findViewById(R.id.linearLayout2);
         actionBar.setTitle("江苏林业学院课表查询");
         dbOperation = new DbOperation(getApplicationContext());
@@ -80,8 +88,9 @@ public class MainActivity extends AppCompatActivity {
                     bitmap = (Bitmap) msg.obj;
                     imageview.setImageBitmap(bitmap);
                     if(teachers==null) teachers = new ArrayList<>();
-                    updateTeacherNameList();
-                    setAdapterOnSpinner();
+                    updateAllList();
+                    initSpinner();
+                    initHistoryList();
                 }
                 if(msg.what == GET_COURSE){
                     Course course = (Course) msg.obj;
@@ -94,6 +103,12 @@ public class MainActivity extends AppCompatActivity {
             }
         };
         requestPermissions(new String[]{Manifest.permission.INSTALL_LOCATION_PROVIDER, Manifest.permission.READ_EXTERNAL_STORAGE}, 0);
+        historyList.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+            @Override
+            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+                autocomplementView.setText(historyCourseList.get(position).get("teacher"));
+            }
+        });
         sp.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {//下拉框监听
             @Override
             public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
@@ -112,7 +127,7 @@ public class MainActivity extends AppCompatActivity {
                     Toast.makeText(getApplicationContext(),"请输入验证码",Toast.LENGTH_SHORT).show();
                     return;
                 }
-                String teacherName = autocomplementView.getText().toString().trim();
+                String teacherName = autocomplementView.getText().toString().trim().replace("(已缓存)","");
                 for(Teacher teacher :teachers){
                     if(teacher.getName().replace("(已缓存)","").equals(teacherName)){
                         try {
@@ -132,9 +147,10 @@ public class MainActivity extends AppCompatActivity {
     protected void onResume() {
         super.onResume();
         if(spinnerAdapter!=null){
-            updateTeacherNameList();
+            updateAllList();
             spinnerAdapter.notifyDataSetChanged();
             linearLayout.setVisibility(View.INVISIBLE);
+            historyAdapter.notifyDataSetChanged();
         }
     }
 
@@ -143,12 +159,17 @@ public class MainActivity extends AppCompatActivity {
         SetTeachersAndVerification();
     }
 
-    public void setAdapterOnSpinner() {//设置下拉框和自动补充框的适配器
+    public void initSpinner() {//设置下拉框和自动补充框的适配器
         spinnerAdapter = new ArrayAdapter<String>(this, android.R.layout.simple_spinner_item, teacherNameList);
         spinnerAdapter.setDropDownViewResource(R.layout.support_simple_spinner_dropdown_item);//spinner下拉视图
         sp.setAdapter(spinnerAdapter);
         ArrayAdapter<String> autocomplementviewadapter= new ArrayAdapter<String>(this,android.R.layout.simple_dropdown_item_1line,teacherNameList);
         autocomplementView.setAdapter(autocomplementviewadapter);
+    }
+
+    public void initHistoryList(){
+        historyAdapter = new HistoryAdapter(getLayoutInflater(),historyCourseList);
+        historyList.setAdapter(historyAdapter);
     }
     public void SetTeachersAndVerification() {//获得图片验证码和老师列表
         new Thread() {
@@ -179,23 +200,39 @@ public class MainActivity extends AppCompatActivity {
         }.start();
     }
 
-    private void initLocalteacher(){
-         ArrayList<Course> courses = dbOperation.select();
-         for(Course course:courses){
-             loaclTeacher.add(course.getTeacherNum());
-         }
+    private void updateAllList(){
+        ArrayList<Course> courses = dbOperation.select();
+        updataTeacherList(courses);
+        updateHistory(courses);
     }
 
-    private void updateTeacherNameList(){
+    private void updataTeacherList(ArrayList<Course> courses){
         teacherNameList.clear();
-        initLocalteacher();
+        for(Course course:courses){
+            loaclTeacherNameSet.add(course.getTeacherNum());
+        }
         for(int i=0;i<teachers.size();i++){
             String teacherName = teachers.get(i).getName();
-            if(loaclTeacher.contains(teachers.get(i).getNumber())){
+            if(loaclTeacherNameSet.contains(teachers.get(i).getNumber())){
                 teacherName = teacherName +" (已缓存)";
             }
             teacherNameList.add(teacherName);
         }
+    }
+
+    private void updateHistory(ArrayList<Course> courses){
+        historyCourseList.clear();
+        for(Course course:courses){
+            Map courseMap = new HashMap();
+            courseMap.put("teacher",course.getTeacher());
+            courseMap.put("classNum",getClassNum(course.getContent()));
+            historyCourseList.add(courseMap);
+        }
+    }
+
+    private String getClassNum(String content){
+        if("".equals(content)) return " ";
+        return "本学期有课程";
     }
 
     public void getCourseList(final Teacher teacher, final String verification)throws IOException {//查询本地数据库或者更新本地数据库
@@ -204,7 +241,7 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void run() {
                 Course course = null;
-                if(loaclTeacher.contains(teacher.getNumber())){
+                if(loaclTeacherNameSet.contains(teacher.getNumber())){
                      course = dbOperation.selectByTeacherNum(teacher.getNumber());
                 }
                 else {
