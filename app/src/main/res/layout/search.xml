@@ -1,56 +1,95 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<android.support.constraint.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical">
-    <LinearLayout
+
+    <ImageView
         android:layout_width="wrap_content"
-        android:layout_height="100dp"
-        android:orientation="horizontal">
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="8dp"
+        android:src="@drawable/sgddu"
+        app:layout_constraintBottom_toTopOf="@+id/linearLayout"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <LinearLayout
+        android:id="@+id/linearLayout"
+        android:layout_width="match_parent"
+        android:layout_height="64dp"
+        android:layout_marginBottom="8dp"
+        android:orientation="horizontal"
+        app:layout_constraintBottom_toTopOf="@+id/linearLayout2"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent">
+
         <android.support.v7.widget.AppCompatAutoCompleteTextView
-            android:layout_width="150dp"
-            android:layout_height="100dp"
-            android:hint="按教师查询："
             android:id="@+id/teacher"
-            android:background="#EED8AE"
-            android:textColor="#0D0D0D"
-            android:completionThreshold="1"/>
+            android:layout_width="wrap_content"
+            android:layout_height="match_parent"
+            android:layout_weight="10"
+            android:background="#EEF5DE"
+            android:completionThreshold="1"
+            android:maxLines="1"
+            android:hint="请输入教师名称"
+            android:gravity="center" />
+
         <Spinner
             android:id="@+id/weekSpinner"
-            android:layout_width="150dp"
-            android:layout_height="wrap_content"
-            android:layout_weight="0" />
-        <Button
-            android:id="@+id/displayCourse"
-            android:layout_width="100dp"
-            android:layout_height="100dp"
-            android:text="查询课表"
-            android:textColor="#0D0D0D" />
+            android:layout_width="wrap_content"
+            android:layout_height="match_parent"
+            android:gravity="center"
+            android:layout_weight="1" />
+
 
     </LinearLayout>
+
     <LinearLayout
+        android:id="@+id/linearLayout2"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:orientation="vertical">
+        android:orientation="vertical"
+        android:maxLines="1"
+        app:layout_constraintBottom_toTopOf="@+id/displayCourse">
+
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:orientation="horizontal">
+
             <ImageView
                 android:id="@+id/imageview"
-                android:layout_weight="1"
                 android:layout_width="wrap_content"
                 android:layout_height="50sp"
-                android:paddingTop="0dp"
                 android:layout_gravity="center_horizontal"
-                android:background="#EEF5DE"/>
+                android:layout_weight="1"
+                android:background="#EEF5DE"
+                android:paddingTop="0dp"
+                tools:layout_editor_absoluteY="411dp" />
+
             <EditText
+                android:id="@+id/et1"
                 android:layout_width="wrap_content"
                 android:layout_height="50dp"
                 android:layout_weight="2"
-                android:id="@+id/et1"
-                android:background="#D2691E"
-                android:hint="请输入验证码"/>
+                android:background="#EEF5DE"
+                android:hint="请输入验证码" />
         </LinearLayout>
     </LinearLayout>
-</LinearLayout>
+
+    <Button
+        android:id="@+id/displayCourse"
+        android:layout_width="match_parent"
+        android:layout_height="64dp"
+        android:layout_marginTop="8dp"
+        android:layout_marginBottom="8dp"
+        android:text="查询课表"
+        android:textColor="#0D0D0D"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintVertical_bias="0.93" />
+
+</android.support.constraint.ConstraintLayout>
