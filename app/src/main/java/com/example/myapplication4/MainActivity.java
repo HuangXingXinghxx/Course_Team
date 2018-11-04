@@ -222,7 +222,8 @@ public class MainActivity extends AppCompatActivity {
 
     private void updateHistory(ArrayList<Course> courses){
         historyCourseList.clear();
-        for(Course course:courses){
+        for(int i=courses.size()-1;i>=0;i--){
+            Course course = courses.get(i);
             Map courseMap = new HashMap();
             courseMap.put("teacher",course.getTeacher());
             courseMap.put("classNum",getClassNum(course.getContent()));
